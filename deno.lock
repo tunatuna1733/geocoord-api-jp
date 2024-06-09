@@ -1,0 +1,21 @@
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@hono/hono@^4.4.2": "jsr:@hono/hono@4.4.3"
+    },
+    "jsr": {
+      "@hono/hono@4.4.3": {
+        "integrity": "c718c68cdb9d5a1109dde0b5413a3ba0c4549025da00a6cab859685c9168e27f"
+      }
+    }
+  },
+  "remote": {
+    "https://cdn.sheetjs.com/xlsx-0.20.2/package/xlsx.mjs": "a09fb310fce98bc4f53e75ae4854384b49d790bb3b0c15a38e9a93014020dc96"
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@hono/hono@^4.4.2"
+    ]
+  }
+}
