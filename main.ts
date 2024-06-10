@@ -79,19 +79,25 @@ app.get('/jma_area', async (c) => {
   if (!latitude || !longtitude) {
     return c.json({
       success: false,
-      error: 'Latitude or longtitude is missing.',
+      data: {
+        error: 'Latitude or longtitude is missing.',
+      },
     });
   }
   const muniCode = await getAreaCode(latitude, longtitude);
   if (muniCode === 0)
     return c.json({
       success: false,
-      error: 'Could not get area code.',
+      data: {
+        error: 'Could not get area code.',
+      },
     });
   const codeIndex = searchMuniCodes(muniCode);
   return c.json({
     success: true,
-    code: codeInfo[codeIndex],
+    data: {
+      code: codeInfo[codeIndex],
+    },
   });
 });
 
