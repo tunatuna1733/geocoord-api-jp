@@ -5,13 +5,61 @@ import * as XLSX from 'https://cdn.sheetjs.com/xlsx-0.20.2/package/xlsx.mjs';
 
 const app = new Hono();
 
+type JmaAreaResponse = {
+  centers: {
+    [C: string]: JmaCenterData;
+  };
+  offices: {
+    [C: string]: JmaOfficeData;
+  };
+  class10s: {
+    [C: string]: JmaClass10Data;
+  };
+  class15s: {
+    [C: string]: JmaClass15Data;
+  };
+  class20s: {
+    [C: string]: JmaClass20Data;
+  };
+};
+
+type JmaBaseData = {
+  name: string;
+  enName: string;
+};
+
+type JmaCenterData = JmaBaseData & {
+  officeName: string;
+  children: string[];
+};
+
+type JmaOfficeData = JmaCenterData & {
+  parent: string;
+};
+
+type JmaClass10Data = JmaBaseData & {
+  parent: string;
+  children: string[];
+};
+
+type JmaClass15Data = JmaClass10Data;
+
+type JmaClass20Data = JmaBaseData & {
+  kana: string;
+  parent: string;
+};
+
 type CodeInfo = {
-  code: number;
+  office_code: number;
+  class10s_code: number;
   pref: string;
   city: string;
 };
 
 const getMuniCodes = async () => {
+  const jmaAreaResponse = await fetch('https://www.jma.go.jp/bosai/common/const/area.json');
+  const jmaArea: JmaAreaResponse = await jmaAreaResponse.json();
+
   const xlsxResponse = await fetch('https://www.soumu.go.jp/main_content/000925835.xlsx');
   const xlsxBuffer = await xlsxResponse.arrayBuffer();
 
@@ -27,7 +75,30 @@ const getMuniCodes = async () => {
       if (!code.endsWith('000')) {
         const pref = row[1];
         const city = row[2];
-        codeInfo.push({ code: parseInt(code), pref, city });
+        // search `code${00}` in class20s
+        const target20Code = code + '00';
+        let code15 = '';
+        Object.entries(jmaArea.class20s).forEach(([c20Code, areaData]) => {
+          if (c20Code === target20Code) {
+            code15 = areaData.parent;
+          }
+        });
+        if (code15 === '') return;
+        let code10 = '';
+        Object.entries(jmaArea.class15s).forEach(([c15Code, areaData]) => {
+          if (c15Code === code15) {
+            code10 = areaData.parent;
+          }
+        });
+        if (code10 === '') return;
+        let officeCode = '';
+        Object.entries(jmaArea.class10s).forEach(([c10Code, areaData]) => {
+          if (c10Code === code10) {
+            officeCode = areaData.parent;
+          }
+        });
+        if (officeCode === '') return;
+        codeInfo.push({ office_code: parseInt(officeCode), class10s_code: parseInt(code10), pref, city });
         muniCodes.push(parseInt(code));
       }
     }
