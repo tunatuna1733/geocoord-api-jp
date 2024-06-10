@@ -44,8 +44,8 @@ type ValidAreaResponse = {
   };
 };
 
-const getAreaCode = async (latitude: string, longtitude: string) => {
-  const url = `https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress?lat=${latitude}&lon=${longtitude}`;
+const getAreaCode = async (latitude: string, longitude: string) => {
+  const url = `https://mreversegeocoder.gsi.go.jp/reverse-geocoder/LonLatToAddress?lat=${latitude}&lon=${longitude}`;
   const response = await fetch(url);
   const json = await response.json();
   if ('results' in json) {
@@ -75,16 +75,16 @@ app.get('/', (c) => {
 });
 
 app.get('/jma_area', async (c) => {
-  const { latitude, longtitude } = c.req.query();
-  if (!latitude || !longtitude) {
+  const { latitude, longitude } = c.req.query();
+  if (!latitude || !longitude) {
     return c.json({
       success: false,
       data: {
-        error: 'Latitude or longtitude is missing.',
+        error: 'Latitude or longitude is missing.',
       },
     });
   }
-  const muniCode = await getAreaCode(latitude, longtitude);
+  const muniCode = await getAreaCode(latitude, longitude);
   if (muniCode === 0)
     return c.json({
       success: false,
