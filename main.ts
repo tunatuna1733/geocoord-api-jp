@@ -148,6 +148,7 @@ app.get('/', (c) => {
 
 app.get('/jma_area', async (c) => {
   const { latitude, longitude } = c.req.query();
+  c.header('Access-Control-Allow-Origin', '*');
   if (!latitude || !longitude) {
     return c.json({
       success: false,
