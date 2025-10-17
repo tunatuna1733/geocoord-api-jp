@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 
-// @deno-types="https://cdn.sheetjs.com/xlsx-0.20.2/package/types/index.d.ts"
-import * as XLSX from 'https://cdn.sheetjs.com/xlsx-0.20.2/package/xlsx.mjs';
+// @deno-types="https://cdn.sheetjs.com/xlsx-0.20.3/package/types/index.d.ts"
+// deno-lint-ignore no-import-prefix
+import * as XLSX from 'https://cdn.sheetjs.com/xlsx-0.20.3/package/xlsx.mjs';
 
 const app = new Hono();
 
@@ -64,9 +65,9 @@ const getMuniCodes = async () => {
   const xlsxBuffer = await xlsxResponse.arrayBuffer();
 
   const workbook = XLSX.read(xlsxBuffer);
-  const worksheetName = workbook.SheetNames.find((n) => n.includes('現在'));
+  const worksheetName = workbook.SheetNames.find((n: string) => n.includes('現在'));
   const worksheet = workbook.Sheets[worksheetName || 'R6.1.1現在の団体'];
-  const contents: string[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+  const contents = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as unknown as string[][];
   const codeInfo: CodeInfo[] = [];
   const muniCodes: number[] = [];
   contents.forEach((row, i) => {
